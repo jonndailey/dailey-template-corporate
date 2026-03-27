@@ -4,3 +4,6 @@ readme-images
 .DS_Store
 **/.yarn
 frontend/next.config.js
+backend/.tmp
+backend/build
+frontend/.next

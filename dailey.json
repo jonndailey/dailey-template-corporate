@@ -1,0 +1,16 @@
+{
+  "name": "Corporate Marketing Site",
+  "description": "Professional marketing site with CMS, hero sections, blog, and team pages powered by Strapi + Next.js",
+  "icon": "globe",
+  "category": "content",
+  "services": { "database": false, "auth": false },
+  "repo": "https://github.com/jonndailey/dailey-template-corporate.git",
+  "branch": "main",
+  "ports": {
+    "frontend": 3000,
+    "backend": 1337
+  },
+  "setup": "npm run setup && npm run seed",
+  "start": "bash start.sh",
+  "notes": "Strapi uses SQLite (no external database needed). First run requires creating an admin user at http://localhost:1337/admin"
+}

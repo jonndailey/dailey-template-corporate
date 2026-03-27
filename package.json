@@ -1,18 +1,16 @@
 {
   "scripts": {
-    "frontend": "yarn dev --prefix ../frontend/",
-    "backend": "yarn dev --prefix ../backend/",
     "clear": "cd frontend && rm -rf .next && rm -rf cache",
-    "setup:frontend": "cd frontend && yarn",
-    "setup:backend": "cd backend && yarn",
-    "setup": "yarn install && yarn setup:frontend && yarn setup:backend",
-    "dev": "yarn clear && concurrently \"cd frontend && yarn dev\" \"cd backend && yarn develop\"",
-    "seed": "cd backend && yarn strapi import -f ../seed-data.tar.gz",
-    "export": "cd backend && yarn strapi export --no-encrypt -f ../seed-data",
-    "repo:upstream": "git fetch upstream && git merge upstream/main"
+    "setup:frontend": "cd frontend && npm install",
+    "setup:backend": "cd backend && npm install",
+    "setup": "npm install && npm run setup:frontend && npm run setup:backend",
+    "dev": "npm run clear && concurrently \"cd frontend && npm run dev\" \"cd backend && npm run develop\"",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "concurrently \"cd backend && npm run start\" \"cd frontend && npm run start\"",
+    "seed": "cd backend && npx strapi import -f ../seed-data.tar.gz",
+    "export": "cd backend && npx strapi export --no-encrypt -f ../seed-data"
   },
   "dependencies": {
-    "concurrently": "^8.2.2",
-    "npm-check-updates": "^16.14.15"
+    "concurrently": "^8.2.2"
   }
 }
