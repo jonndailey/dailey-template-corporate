@@ -12,5 +12,12 @@
   },
   "setup": "npm run setup && npm run seed",
   "start": "bash start.sh",
-  "notes": "Strapi uses SQLite (no external database needed). First run requires creating an admin user at http://localhost:1337/admin"
+  "notes": "Strapi uses SQLite (no external database needed). First run requires creating an admin user at http://localhost:1337/admin",
+  "env": {
+    "APP_KEYS": { "autoGenerate": true, "length": 32, "label": "Strapi app keys" },
+    "API_TOKEN_SALT": { "autoGenerate": true, "length": 32, "label": "Strapi API token salt" },
+    "ADMIN_JWT_SECRET": { "autoGenerate": true, "length": 48, "label": "Strapi admin JWT secret" },
+    "JWT_SECRET": { "autoGenerate": true, "length": 48, "label": "Strapi user JWT secret" },
+    "TRANSFER_TOKEN_SALT": { "autoGenerate": true, "length": 32, "label": "Strapi transfer token salt" }
+  }
 }
