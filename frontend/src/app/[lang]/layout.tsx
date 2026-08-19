@@ -9,6 +9,10 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import {FALLBACK_SEO} from "@/app/[lang]/utils/constants";
 
+// Content comes from Strapi, which is not running at build time.
+// Render all pages on demand instead of prerendering them during `next build`.
+export const dynamic = "force-dynamic";
+
 
 async function getGlobal(lang: string): Promise<any> {
   const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;

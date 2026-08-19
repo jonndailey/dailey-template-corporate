@@ -59,25 +59,30 @@ export default async function PostRoute({ params }: { params: { slug: string } }
 }
 
 export async function generateStaticParams() {
-    const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
-    const path = `/articles`;
-    const options = { headers: { Authorization: `Bearer ${token}` } };
-    const articleResponse = await fetchAPI(
-        path,
-        {
-            populate: ['category'],
-        },
-        options
-    );
+    // Strapi is not running at build time; render article pages on demand.
+    try {
+        const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
+        const path = `/articles`;
+        const options = { headers: { Authorization: `Bearer ${token}` } };
+        const articleResponse = await fetchAPI(
+            path,
+            {
+                populate: ['category'],
+            },
+            options
+        );
 
-    return articleResponse.data.map(
-        (article: {
-            attributes: {
-                slug: string;
-                category: {
+        return articleResponse.data.map(
+            (article: {
+                attributes: {
                     slug: string;
+                    category: {
+                        slug: string;
+                    };
                 };
-            };
-        }) => ({ slug: article.attributes.slug, category: article.attributes.slug })
-    );
+            }) => ({ slug: article.attributes.slug, category: article.attributes.slug })
+        );
+    } catch {
+        return [];
+    }
 }
