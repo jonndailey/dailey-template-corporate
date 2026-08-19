@@ -53,6 +53,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Matcher ignoring `/_next/` and `/api/`
-    matcher: ['/((?!_next).*)'],
+    // Matcher ignoring `/_next/`, `/api/`, and `/uploads/` (media proxied to Strapi)
+    matcher: ['/((?!_next|api/|uploads/).*)'],
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { getStrapiMedia, getStrapiURL } from "./utils/api-helpers";
+import { getStrapiMedia } from "./utils/api-helpers";
 import { fetchAPI } from "./utils/fetch-api";
 
 import { i18n } from "../../../i18n-config";
@@ -52,7 +52,7 @@ export async function generateMetadata({ params } : { params: {lang: string}}): 
     title: metadata?.metaTitle ?? FALLBACK_SEO.title,
     description: metadata?.metaDescription ?? FALLBACK_SEO.description,
     ...(faviconUrl
-      ? { icons: { icon: [new URL(faviconUrl, getStrapiURL())] } }
+      ? { icons: { icon: [getStrapiMedia(faviconUrl) as string] } }
       : {}),
   };
 }
