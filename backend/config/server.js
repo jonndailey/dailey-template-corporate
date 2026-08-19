@@ -5,4 +5,9 @@ module.exports = ({ env }) => ({
     keys: env.array('APP_KEYS'),
   },
   url: env('STRAPI_URL'),
+  dirs: {
+    // Overridable so deployed containers with a read-only app dir can point
+    // uploads/import-backups at a writable location (see start.sh).
+    public: env('STRAPI_PUBLIC_DIR', './public'),
+  },
 });

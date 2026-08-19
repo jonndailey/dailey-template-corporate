@@ -33,6 +33,18 @@ fi
 rm -f "$DB_DIR/.writecheck" 2>/dev/null || true
 export DATABASE_FILENAME="$(cd "$DB_DIR" && pwd)/data.db"
 
+# --- Strapi public dir: must be writable (uploads + `strapi import` asset backups) ---
+PUBLIC_DIR="backend/public"
+if ! touch "$PUBLIC_DIR/.writecheck" 2>/dev/null; then
+  WRITABLE_PUBLIC="${TMPDIR:-/tmp}/strapi-public"
+  mkdir -p "$WRITABLE_PUBLIC/uploads"
+  cp -r "$PUBLIC_DIR/." "$WRITABLE_PUBLIC/" 2>/dev/null || true
+  PUBLIC_DIR="$WRITABLE_PUBLIC"
+  echo "Public directory is not writable; using $PUBLIC_DIR for Strapi assets."
+fi
+rm -f "$PUBLIC_DIR/.writecheck" 2>/dev/null || true
+export STRAPI_PUBLIC_DIR="$(cd "$PUBLIC_DIR" && pwd)"
+
 # --- Local development conveniences (no-ops in a built container) ---
 if [ ! -d "node_modules" ]; then
   echo "Installing root dependencies..."
@@ -51,11 +63,17 @@ if [ ! -d "backend/build" ]; then
   (cd backend && npm run build)
 fi
 
-# --- Seed initial content once ---
+# --- Seed initial content once (idempotent: only when the DB does not exist yet) ---
 if [ ! -f "$DATABASE_FILENAME" ] && [ -f "seed-data.tar.gz" ]; then
   echo "Seeding initial data..."
-  (cd backend && npx strapi import -f ../seed-data.tar.gz --force) \
-    || echo "WARNING: seeding failed; starting with an empty database."
+  if (cd backend && npx strapi import -f ../seed-data.tar.gz --force); then
+    echo "Seed complete."
+  else
+    # Remove the partially-created DB so the next boot retries the seed
+    # instead of permanently serving an empty site.
+    echo "WARNING: seeding failed; starting with an empty database."
+    rm -f "$DATABASE_FILENAME"
+  fi
 fi
 
 echo ""
