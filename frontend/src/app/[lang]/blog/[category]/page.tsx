@@ -23,7 +23,9 @@ async function fetchPostsByCategory(filter: string) {
                 },
             },
         };
-        const options = { headers: { Authorization: `Bearer ${token}` } };
+        const options = token
+            ? { headers: { Authorization: `Bearer ${token}` } }
+            : {};
         const responseData = await fetchAPI(path, urlParamsObject, options);
         return responseData;
     } catch (error) {
@@ -33,10 +35,10 @@ async function fetchPostsByCategory(filter: string) {
 
 export default async function CategoryRoute({ params }: { params: { category: string } }) {
     const filter = params.category;
-    const { data } = await fetchPostsByCategory(filter);
+    const { data } = (await fetchPostsByCategory(filter)) ?? {};
 
     //TODO: CREATE A COMPONENT FOR THIS
-    if (data.length === 0) return <div>Not Posts In this category</div>;
+    if (!data?.length) return <div>Not Posts In this category</div>;
 
     const { name, description } = data[0]?.attributes.category.data.attributes;
 

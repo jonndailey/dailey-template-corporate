@@ -27,11 +27,12 @@ async function fetchSideMenuData(filter: string) {
     );
 
     return {
-      articles: articlesResponse.data,
-      categories: categoriesResponse.data,
+      articles: articlesResponse?.data ?? [],
+      categories: categoriesResponse?.data ?? [],
     };
   } catch (error) {
     console.error(error);
+    return { articles: [], categories: [] };
   }
 }
 

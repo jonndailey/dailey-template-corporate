@@ -8,7 +8,7 @@
     "build": "npm run build:backend && npm run build:frontend",
     "build:backend": "cd backend && npm install && npm run build",
     "build:frontend": "cd frontend && npm install && npm run build",
-    "start": "concurrently \"cd backend && npm run start\" \"cd frontend && npm run start\"",
+    "start": "bash start.sh",
     "seed": "cd backend && npx strapi import -f ../seed-data.tar.gz",
     "export": "cd backend && npx strapi export --no-encrypt -f ../seed-data"
   },

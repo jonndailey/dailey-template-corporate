@@ -6,16 +6,26 @@ export async function fetchAPI(
   urlParamsObject = {},
   options = {}
 ) {
-  try {
-    // Merge default and user options
-    const mergedOptions = {
-      next: { revalidate: 60 },
-      headers: {
-        "Content-Type": "application/json",
-      },
-      ...options,
-    };
+  // Merge default and user options
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...((options as any).headers || {}),
+  };
 
+  // Never send a broken "Bearer undefined" header: Strapi treats any
+  // Authorization header as an auth attempt, turning public reads into 401s.
+  const auth = headers.Authorization;
+  if (!auth || /^Bearer\s*(undefined|null)?$/.test(auth.trim())) {
+    delete headers.Authorization;
+  }
+
+  const mergedOptions = {
+    next: { revalidate: 60 },
+    ...options,
+    headers,
+  };
+
+  try {
     // Build request URL
     const queryString = qs.stringify(urlParamsObject);
     const requestUrl = `${getStrapiURL(
@@ -24,11 +34,11 @@ export async function fetchAPI(
 
     // Trigger API call
     const response = await fetch(requestUrl, mergedOptions);
-    const data = await response.json();
-    return data;
-    
+    return await response.json();
   } catch (error) {
-    console.error(error);
-    throw new Error(`Please check if your server is running and you set all the required tokens.`);
+    // Fail soft: an unreachable Strapi should degrade to empty content,
+    // never a hard 500 on every page.
+    console.error(`fetchAPI(${path}) failed:`, error);
+    return { data: null, meta: {}, error: true };
   }
 }

@@ -17,10 +17,10 @@ export const dynamic = "force-dynamic";
 async function getGlobal(lang: string): Promise<any> {
   const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN;
 
-  if (!token) throw new Error("The Strapi API Token environment variable is not set.");
-
   const path = `/global`;
-  const options = { headers: { Authorization: `Bearer ${token}` } };
+  const options = token
+    ? { headers: { Authorization: `Bearer ${token}` } }
+    : {};
 
   const urlParamsObject = {
     populate: [
@@ -43,17 +43,17 @@ async function getGlobal(lang: string): Promise<any> {
 export async function generateMetadata({ params } : { params: {lang: string}}): Promise<Metadata> {
   const meta = await getGlobal(params.lang);
 
-  if (!meta.data) return FALLBACK_SEO;
+  if (!meta?.data) return FALLBACK_SEO;
 
   const { metadata, favicon } = meta.data.attributes;
-  const { url } = favicon.data.attributes;
+  const faviconUrl = favicon?.data?.attributes?.url;
 
   return {
-    title: metadata.metaTitle,
-    description: metadata.metaDescription,
-    icons: {
-      icon: [new URL(url, getStrapiURL())],
-    },
+    title: metadata?.metaTitle ?? FALLBACK_SEO.title,
+    description: metadata?.metaDescription ?? FALLBACK_SEO.description,
+    ...(faviconUrl
+      ? { icons: { icon: [new URL(faviconUrl, getStrapiURL())] } }
+      : {}),
   };
 }
 
@@ -65,8 +65,19 @@ export default async function RootLayout({
   readonly params: { lang: string };
 }) {
   const global = await getGlobal(params.lang);
-  // TODO: CREATE A CUSTOM ERROR PAGE
-  if (!global.data) return null;
+  // Fail soft: if Strapi is unreachable or global content is missing,
+  // still render a valid document instead of crashing the whole site.
+  if (!global?.data) {
+    return (
+      <html lang={params.lang}>
+        <body>
+          <main className="dark:bg-black dark:text-gray-100 min-h-screen">
+            {children}
+          </main>
+        </body>
+      </html>
+    );
+  }
   
   const { notificationBanner, navbar, footer } = global.data.attributes;
 
